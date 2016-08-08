@@ -11,7 +11,8 @@ namespace WebApiOwinIdentityOAuthJwtSample
         public void Configuration(IAppBuilder app)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
-            
+
+            ConfigureDbContext(app);
             ConfigureAuth(app);
             ConfigureWebApi(app);
         }
