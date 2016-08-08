@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.OAuth;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -11,15 +12,17 @@ namespace WebApiOwinIdentityOAuthJwtSample.Security
     {
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
-            await Task.Run(() =>
-            {
-                context.Validated();
-            });
+            await Task.Run(() => { context.Validated(); });
         }
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var userManager = context.OwinContext.GetUserManager<UserManager<IdentityUser>>();
+
+            if (userManager == null)
+            {
+                throw new InvalidOperationException("An UserManager is not registered within the OWIN context.");
+            }
 
             var user = await userManager.FindByNameAsync(context.UserName);
             var authenticated = await userManager.CheckPasswordAsync(user, context.Password);
